@@ -43,41 +43,49 @@ void SerController::printComs(){
 void SerController::accAnsw(std::promise<std::string> readStop){
     std::string strAnsw="";
     char chIn='0';
-    m_port->readPort(&chIn,1);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    while(chIn!=-1){
+        m_port->readPort(&chIn,1);
+        if(chIn!=-1)
+            strAnsw.push_back(chIn);
+    }
     readStop.set_value(strAnsw);
     LOG_I("tread joined","ok ");
 }
 
-void SerController::sendCmd(std::string strPort,std::string strCmd){
+bool SerController::sendCmd(std::string strPort,std::string strCmd){
     //
-    char *chSend=const_cast<char*>(strCmd.c_str());
+    bool bRes=false;
+
     SerialParams prm;
     prm.strPort=strPort;
-    prm.iBaudRate=9600;
-    prm.iDataBits=8;
-    prm.iStopBits=1;
+
+    prm.iBaudRate=000015;
+    prm.iDataBits=000060;
+    prm.iStopBits=0;
     prm.iFlowCnt=0;
     if(!m_port->openPort(&prm)){
         LOG_E(strPort,"can`t open");
-        return;
+        return bRes;
     }
     //
-
-
+    char *chSend=const_cast<char*>(strCmd.c_str());
     std::promise<std::string> readPromise;
     std::future<std::string>  readFuture=readPromise.get_future();
     //here send package to port
+    LOG_I("sercontr ","sending to port");
     m_port->writePort(chSend,strCmd.length());
     //here send package to port
     std::thread readThr(&SerController::accAnsw,this,std::move(readPromise));
     readThr.detach();
     std::chrono::system_clock::time_point milis200=std::chrono::system_clock::now()+std::chrono::milliseconds(200);
     if(readFuture.wait_until(milis200)!=std::future_status::ready){
-        LOG_E(strPort,"timedout");
+        LOG_E(strPort,"timedout");        
     }else{
         LOG_I(strPort,"ok "+readFuture.get());
+        bRes=true;
     };
     m_port->closePort();
+    delete chSend;
+    return bRes;
 }
 

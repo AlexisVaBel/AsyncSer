@@ -11,7 +11,7 @@ public:
     SerController(std::string strPort);
     ~SerController();
     void    printComs();
-    void    sendCmd(std::string strPort, std::string strCmd);
+    bool    sendCmd(std::string strPort, std::string strCmd);
 private:
     std::string m_strPort;
     PortInterface   *m_port;

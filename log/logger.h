@@ -17,6 +17,10 @@ static void LOG_I(std::string strSender,std::string msg, char chDecor='0'){
     if(chDecor!='0')printDecor(iAllItems,chDecor);
 }
 
+static void LOG_CHAR(std::string strSender="", char chSND='0'){
+    std::cout<<strSender<<": "<<chSND<<std::endl;
+}
+
 static void LOG_E(std::string strSender,std::string msg){
     LOG_I(strSender,msg,'!');
 }

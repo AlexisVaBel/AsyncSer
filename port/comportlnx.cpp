@@ -56,10 +56,14 @@ bool COMPortLnx::closePort(){
 
 bool COMPortLnx::readPort(char *chPack, int iCnt){
     int iVal=(read(m_iPortID,chPack,iCnt));
+    LOG_I("portlinux "," got paket");
+    LOG_CHAR(chPack);
     return(iVal>0);
 }
 
-bool COMPortLnx::writePort(char *chPack, int iCnt){    
+bool COMPortLnx::writePort(char *chPack, int iCnt){
+    LOG_I("portlinux "," send paket");
+    LOG_CHAR(chPack);
     tcflush(m_iPortID,TCIOFLUSH);
     return (write(m_iPortID,chPack,iCnt)>0);
 }
